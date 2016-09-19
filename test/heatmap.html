@@ -1,0 +1,60 @@
+<html>
+<head>
+  <meta charset=utf-8 />
+  <title>Points as a heatmap</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+  <!-- Load Leaflet from CDN-->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet-src.js"></script>
+
+  <!-- Load Esri Leaflet from CDN -->
+  <script src="https://unpkg.com/esri-leaflet@2.0.3"></script>
+
+  <style>
+    body { margin:0; padding:0; }
+    #map { position: absolute; top:0; bottom:0; right:0; left:0; }
+  </style>
+</head>
+<body>
+
+<!-- Include Leaflet.heat via rawgit.com
+in production you'd be better off hosting this library yourself -->
+
+<script src="https://rawgit.com/Leaflet/Leaflet.heat/gh-pages/dist/leaflet-heat.js"></script>
+
+<!-- Load Heatmap Feature Layer from CDN -->
+<script src="https://unpkg.com/esri-leaflet-heatmap@2.0.0"></script>
+
+<div id="map"></div>
+
+<script>
+  var map = L.map('map').setView([ 35.681298, 139.766247], 10);
+  var id;
+  
+  L.esri.basemapLayer('Gray').addTo(map);
+  
+  getIdfromUrl();
+
+  // new constructor syntax at 2.0.0
+  L.esri.Heat.featureLayer({
+    url: 'http://services5.arcgis.com/HzGpeRqGvs5TMkVr/arcgis/rest/services/MHS_item_LID_12_food_tokyo/FeatureServer/0',
+    where: "monitorID='" + id + "'",
+    token : "cnUPcTTuf8QShJAAwbgOXQx7pBL9yK26HykxF65j7UJBm3UhX2c3bw09dFCYVuDPhU0EZjGVwEX1T1YjmoWcoLLl7OqYhohBizSHOydpBCmcnX5IDWUsHzfMOIeZRZiL1t8SGDYm37GPFR2qsFLMeK6-hqDYtfsLH5GggLk6j3qJWetuWg_IeJd6wc-_qnSE_yZTuDbWHpkobRUIKpPSUuGufWcTf9f4FVpjv437dPnqsQwXrErRCkGiLfHAJBhgijhTpasoaUFtSPKTA93v1A..",
+    radius: 35
+  }).addTo(map);
+  
+  function getIdfromUrl() {
+    var urlParams = location.search.substring(1).split('&');
+    for (var i=0; urlParams[i]; i++) {
+        var param = urlParams[i].split('=');
+        if(param[0] === 'id') {
+            id = param[1];
+        }
+    }
+  }
+  
+</script>
+
+</body>
+</html>
