@@ -47,6 +47,18 @@
     <![endif]-->
 
     <script type="text/babel">
+      //var queryUrl = "//services5.arcgis.com/HzGpeRqGvs5TMkVr/arcgis/rest/services/aMHS_item_LID_12/FeatureServer/0/query?f=geojson&where=(item_S%20%3D%20N'食事代（店内）')%20AND%20(total_price%20%3E%3D%2010000)&returnGeometry=true&spatialRel=esriSpatialRelIntersects&geometry=%7B%22xmin%22%3A15497760.358889386%2C%22ymin%22%3A4226661.916050987%2C%22xmax%22%3A15576031.875853434%2C%22ymax%22%3A4304933.433015037%2C%22spatialReference%22%3A%7B%22wkid%22%3A102100%2C%22latestWkid%22%3A3857%7D%7D&geometryType=esriGeometryEnvelope&inSR=102100&outFields=*&outSR=102100&resultType=tile&token=Gz9Is-rEneW6tI-A0JEAFdamIFGiWo4vyTW_BMJG8bsRyAwzfGFSQUSLA5sYduGD5SZwi62ZanaBYwzegHAwLKiK0qhugTQtcXqXTfu-oVb1QA03lG1r_QkStjeLq6aU02U3BPES8xsInbutxX6bK9ZOYClqU6lnYfZICnudcatzSCv4DpyRNH_GgDaZSPLY-YuEwtjJ4cS-TOk2CLOReXni2twHZbndliMpSfvWnFTjL2q-GHbaurtVlOi2x0gT";
+      var queryUrl = '';
+      getQueryfromUrl();
+
+      function getQueryfromUrl() {
+        var splitUrl = location.search.substring(1).split('?');
+        console.log(splitUrl);
+        queryUrl = splitUrl[0].split('=')[1] + '?' + splitUrl[1];
+        console.log(queryUrl);
+        queryUrl = decodeURI(queryUrl);
+      }
+
       // React Bootstrap Components
       var ListGroup= ReactBootstrap.ListGroup;
       var ListGroupItem = ReactBootstrap.ListGroupItem;
@@ -63,14 +75,15 @@
           }
         },
         componentDidMount() {
-          var reqUrl = "//services5.arcgis.com/HzGpeRqGvs5TMkVr/arcgis/rest/services/aMHS_item_LID_12/FeatureServer/0/query?f=geojson&where=(item_S%20%3D%20N'食事代（店内）')%20AND%20(total_price%20%3E%3D%2010000)&returnGeometry=true&spatialRel=esriSpatialRelIntersects&geometry=%7B%22xmin%22%3A15497760.358889386%2C%22ymin%22%3A4226661.916050987%2C%22xmax%22%3A15576031.875853434%2C%22ymax%22%3A4304933.433015037%2C%22spatialReference%22%3A%7B%22wkid%22%3A102100%2C%22latestWkid%22%3A3857%7D%7D&geometryType=esriGeometryEnvelope&inSR=102100&outFields=*&outSR=102100&resultType=tile&token=Gz9Is-rEneW6tI-A0JEAFdamIFGiWo4vyTW_BMJG8bsRyAwzfGFSQUSLA5sYduGD5SZwi62ZanaBYwzegHAwLKiK0qhugTQtcXqXTfu-oVb1QA03lG1r_QkStjeLq6aU02U3BPES8xsInbutxX6bK9ZOYClqU6lnYfZICnudcatzSCv4DpyRNH_GgDaZSPLY-YuEwtjJ4cS-TOk2CLOReXni2twHZbndliMpSfvWnFTjL2q-GHbaurtVlOi2x0gT";
+          var reqUrl = queryUrl;
           L.esri.get(reqUrl, {}, function (error, response) {
             if(error){
               console.log(error);
             } else {
               console.log(response);
               var data = response.features.sort(function (a, b) {
-                return a.properties['total_price'] - b.properties['total_price'];
+                  console.log(a.properties);
+                  return a.properties['total_price'] - b.properties['total_price'];
               });
               console.log(data);
               this.setState({ data: data });
@@ -78,7 +91,7 @@
           }, this);
         },
         showMap(e) {
-          location.href = 'heatmap.html?id=' + e.target.title;
+          location.href = 'heatmap.html?id=' + e.target.title + '&shopName=' + e.target.id;
         },
         showGoogle(e) {
           location.href = 'https://www.google.co.jp/#q=' + e.target.title;
@@ -88,12 +101,14 @@
             console.log(f);
             console.log(f.properties);
             var monitorID = f.properties['monitorID'];
+            var geometry = f.geometry.coordinates;
             var shopName = f.properties['shop_name'];
             var age = f.properties['age'];
             var marriage = f.properties['marriage'].split('_')[1];
             var child = f.properties['child'].split('_')[1];
             var payMethod = f.properties['pay_method'];
             var price = f.properties['total_price'];
+            console.log(geometry);
             return (
               <Panel header={shopName} bsStyle="primary" key={shopName}>
                 <Label bsStyle="info">{age}</Label>&nbsp;
@@ -101,7 +116,7 @@
                 <Label>{child}</Label>&nbsp;
                 <Label>{payMethod}</Label>
                 <h3>価格: {price}円</h3>
-                <Button title={monitorID} onClick={this.showMap} bsStyle="warning">消費行動マップ <Glyphicon glyph="map-marker" /></Button>&nbsp;
+                <Button title={monitorID} id={shopName} onClick={this.showMap} bsStyle="warning">消費行動マップ <Glyphicon glyph="map-marker" /></Button>&nbsp;
                 <Button title={shopName} onClick={this.showGoogle}>Google 検索</Button>
               </Panel>
             );
