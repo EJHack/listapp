@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Shop List</title>
+    <link rel="shortcut icon" href="img/favicon.ico">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-social/4.10.1/bootstrap-social.min.css" />
+    <!--<link rel="stylesheet" href="assets/style.css" />-->
+  </head>
+
+  <body>
+    <div id="containerDOM"></div>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react-dom.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/react-bootstrap/0.30.3/react-bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+
+    <!-- Load Leaflet from CDN-->
+    <link rel="stylesheet" href="//unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css" />
+    <script src="//unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet-src.js"></script>
+
+    <!-- Load Esri Leaflet from CDN -->
+    <script src="//unpkg.com/esri-leaflet@2.0.3"></script>
+
+    <!--[if lt IE 9]>
+      <script>
+        (function(){
+          var ef = function(){};
+          window.console = window.console || {log:ef,warn:ef,error:ef,dir:ef};
+        }());
+      </script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv-printshiv.min.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/3.4.0/es5-shim.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/3.4.0/es5-sham.js"></script>
+    <![endif]-->
+
+    <script type="text/babel">
+      // React Bootstrap Components
+      var ListGroup= ReactBootstrap.ListGroup;
+      var ListGroupItem = ReactBootstrap.ListGroupItem;
+      var Button = ReactBootstrap.Button;
+
+      // Item Layout
+      var List = React.createClass({
+        getInitialState() {
+          return {
+            data: { features: [] }
+          }
+        },
+        componentDidMount() {
+          var reqUrl = "http://services5.arcgis.com/HzGpeRqGvs5TMkVr/arcgis/rest/services/aMHS_item_LID_12/FeatureServer/0/query?f=geojson&where=(item_S%20%3D%20N'食事代（店内）')%20AND%20(total_price%20%3E%3D%2010000)&returnGeometry=true&spatialRel=esriSpatialRelIntersects&geometry=%7B%22xmin%22%3A15419488.841925338%2C%22ymin%22%3A4148390.399086939%2C%22xmax%22%3A15497760.358889386%2C%22ymax%22%3A4226661.916050987%2C%22spatialReference%22%3A%7B%22wkid%22%3A102100%2C%22latestWkid%22%3A3857%7D%7D&geometryType=esriGeometryEnvelope&inSR=102100&outFields=*&outSR=102100&resultType=tile&token=Gz9Is-rEneW6tI-A0JEAFdamIFGiWo4vyTW_BMJG8bsRyAwzfGFSQUSLA5sYduGD5SZwi62ZanaBYwzegHAwLKiK0qhugTQtcXqXTfu-oVb1QA03lG1r_QkStjeLq6aU02U3BPES8xsInbutxX6bK9ZOYClqU6lnYfZICnudcatzSCv4DpyRNH_GgDaZSPLY-YuEwtjJ4cS-TOk2CLOReXni2twHZbndliMpSfvWnFTjL2q-GHbaurtVlOi2x0gT";
+          L.esri.get(reqUrl, {}, function (error, response) {
+            if(error){
+              console.log(error);
+            } else {
+              console.log(response);
+              this.setState({ data: response });
+            }
+          }, this);
+        },
+        render() {
+          var listItems = this.state.data.features.map(function (f, i) {
+            console.log(f);
+            console.log(f.properties);
+            return (
+              <ListGroup key={f.properties['shop_name']}>
+                <ListGroupItem>
+                  <h3>{f.properties['shop_name']}</h3><span class="tag tag-default tag-pill pull-xs-right">{f.properties['age']}</span>
+                </ListGroupItem>
+              </ListGroup>
+            );
+          });
+          return (
+            <div>{listItems}</div>
+          )
+        }
+      });
+
+      ReactDOM.render(<List />, document.getElementById("containerDOM"));
+
+    </script>
+  </body>
+</html>
