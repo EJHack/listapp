@@ -52,11 +52,12 @@
       getQueryfromUrl();
 
       function getQueryfromUrl() {
+        var url = decodeURI(location.search);
         var splitUrl = location.search.substring(1).split('?');
         console.log(splitUrl);
         queryUrl = splitUrl[0].split('=')[1] + '?' + splitUrl[1];
         console.log(queryUrl);
-        queryUrl = decodeURI(queryUrl);
+        //queryUrl = decodeURI(queryUrl);
       }
 
       // React Bootstrap Components
